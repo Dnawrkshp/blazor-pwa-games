@@ -25,6 +25,9 @@ async function onInstall(event) {
         .filter(asset => !offlineAssetsExclude.some(pattern => pattern.test(asset.url)))
         .map(asset => new Request(asset.url, { /* integrity: asset.hash, */ cache: 'no-cache' }));
     await caches.open(cacheName).then(cache => cache.addAll(assetsRequests));
+    
+    // Install service worker immediately
+    self.skipWaiting();
 }
 
 async function onActivate(event) {
@@ -35,6 +38,12 @@ async function onActivate(event) {
     await Promise.all(cacheKeys
         .filter(key => key.startsWith(cacheNamePrefix) && key !== cacheName)
         .map(key => caches.delete(key)));
+        
+    // Reload all open clients (tabs)
+    const clientList = await clients.matchAll({ type: 'window' });
+    for (const client of clientList) {
+        client.navigate(client.url);
+    }
 }
 
 async function onFetch(event) {
