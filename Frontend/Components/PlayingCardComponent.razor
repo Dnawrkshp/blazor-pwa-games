@@ -1,6 +1,6 @@
 @using System.Text
 
-<div class="playing-card">
+<div @key="@Card" class="playing-card" @onclick="OnClick">
     @if (Card.IsFaceUp)
     {
         <MudImage Src="@Card.GetImagePath()" Alt="@Card.ToString()" Height="@GetHeight()" Style="@Style" />
@@ -16,6 +16,7 @@
     [Parameter, EditorRequired] public PlayingCard Card { get; set; }
     [Parameter] public Size Size { get; set; } = Size.Medium;
     [Parameter] public string? Style { get; set; }
+    [Parameter] public EventCallback OnClick { get; set; }
 
     private int GetHeight()
     {

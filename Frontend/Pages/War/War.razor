@@ -4,45 +4,87 @@
 
 <br/>
 <MudStack Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Spacing="2" Class="mud-width-full mud-height-full">
-    <WarPlayerComponent Player="@opp" />
-    <WarBoardComponent TopPlayer="@opp" BottomPlayer="@player" />
-    <WarPlayerComponent Player="@player" />
+    <WarPlayerComponent Player="@_game.Opponent" />
+    <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center" Class="mud-width-full">
+        @if (_game.PlayerWon)
+        {
+            <MudStack Spacing="2" AlignItems="AlignItems.Center">
+                <MudText Typo="Typo.h3">You Win</MudText>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ResetGame">Play Again?</MudButton>
+                <br/>
+            </MudStack>
+        }
+        else if (_game.PlayerLost)
+        {
+            <MudStack Spacing="2" AlignItems="AlignItems.Center">
+                <MudText Typo="Typo.h3">You Lost</MudText>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ResetGame">Play Again?</MudButton>
+                <br/>
+            </MudStack>
+        }
+        else if (_lastOutcome == WarBattleOutcome.War)
+        {
+            <MudStack Spacing="0" AlignItems="AlignItems.Center">
+                <MudText Typo="Typo.h5">WAR</MudText>
+                <MudText Typo="Typo.caption">Play 4</MudText>
+            </MudStack>
+        }
+        else if (_lastOutcome == WarBattleOutcome.PlayerWon)
+        {
+            <MudText Typo="Typo.h5">Win</MudText>
+        }
+        else if (_lastOutcome == WarBattleOutcome.OpponentWon)
+        {
+            <MudText Typo="Typo.h5">Loss</MudText>
+        }
+        <WarBoardComponent TopPlayer="@_game.Opponent" BottomPlayer="@_game.Player" />
+    </MudStack>
+    <WarPlayerComponent Player="@_game.Player" OnDeckClicked="@OnPlayerDeckClickedAsync" />
 </MudStack>
 
-<MudButton Variant="Variant.Filled" OnClick="ResetGame">Restart Game</MudButton>
-
 @code {
-    private WarPlayer player = new WarPlayer();
-    private WarPlayer opp = new WarPlayer();
+    private WarGame _game = new WarGame();
+    private WarBattleOutcome _lastOutcome = WarBattleOutcome.InProgress;
+    private int _inAction = 0;
 
     protected override void OnInitialized()
     {
         base.OnInitialized();
         ResetGame();
-        StateHasChanged();
     }
 
     private void ResetGame()
     {
-        PlayingCardDeck? deck = PlayingCardDeck.CreateStandardDeck();
-        deck.Shuffle();
+        _game.Reset();
+        StateHasChanged();
+    }
 
-        player.Reset();
-        opp.Reset();
-
-        for (int i = 0; deck.Count > 0; i++)
+    private async Task OnPlayerDeckClickedAsync()
+    {
+        if (_inAction > 0)
         {
-            var card = deck.Pop();
-            if (card == null) break;
-
-            if (i % 2 == 0)
-            {
-                player.Deck.Push(card.Value);
-            }
-            else
-            {
-                opp.Deck.Push(card.Value);
-            }
+            _lastOutcome = _game.CheckBattle();
+            _game.CheckShuffle();
+            await InvokeAsync(StateHasChanged);
         }
+
+        var actionId = ++_inAction;
+
+        // begin
+        _game.DrawCards();
+        _lastOutcome = _game.GetOutcome();
+        await InvokeAsync(StateHasChanged);
+        await Task.Delay(1000);
+        if (_inAction != actionId) return;
+
+        // show outcome
+        _lastOutcome = _game.CheckBattle();
+        await InvokeAsync(StateHasChanged);
+        //await Task.Delay(100);
+
+        // reset
+        _inAction = 0;
+        _game.CheckShuffle();
+        await InvokeAsync(StateHasChanged);
     }
 }

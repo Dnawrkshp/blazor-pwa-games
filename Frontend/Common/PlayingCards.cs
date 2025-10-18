@@ -26,7 +26,7 @@ namespace Frontend.Common
         King
     }
 
-    public struct PlayingCard
+    public class PlayingCard
     {
         public Suit Suit { get; set; }
         public Rank Rank { get; set; }
@@ -74,7 +74,7 @@ namespace Frontend.Common
         public bool Equals(PlayingCard? other)
         {
             if (other is null) return false;
-            return Suit == other.Value.Suit && Rank == other.Value.Rank;
+            return Suit == other.Suit && Rank == other.Rank;
         }
 
         public override bool Equals(object? obj)
@@ -83,13 +83,8 @@ namespace Frontend.Common
             return Suit == other.Suit && Rank == other.Rank;
         }
 
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(Suit, Rank);
-        }
-
-        public static bool operator ==(PlayingCard left, PlayingCard right) => left.Equals(right);
-        public static bool operator !=(PlayingCard left, PlayingCard right) => !left.Equals(right);
+        public static bool operator ==(PlayingCard? left, PlayingCard? right) => Equals(left, right);
+        public static bool operator !=(PlayingCard? left, PlayingCard? right) => !Equals(left, right);
     }
 
     public class PlayingCardDeck

@@ -1,11 +1,17 @@
 @using System.Text
 
 <MudStack Row>
-    <PlayingCardStack Cards="@Player.Discard" Neat="false" Width="200" Height="150" />
-    <PlayingCardStack Cards="@Player.Deck.Cards" Neat="true" Width="200" Height="150" />
+    <MudStack Row Justify="Justify.Center" AlignItems="AlignItems.Center" Spacing="0">
+        <PlayingCardStack Cards="@Player.Discard" Neat="false" Width="80" Height="150" />
+        <MudText Typo="Typo.h5">@Player.Discard.Count</MudText>
+    </MudStack>
+    <MudStack Row Justify="Justify.Center" AlignItems="AlignItems.Center" Spacing="0">
+        <PlayingCardStack Cards="@Player.Deck.Cards" Neat="false" Width="80" Height="150" OnCardClicked="OnDeckClicked" />
+        <MudText Typo="Typo.h5">@Player.Deck.Count</MudText>
+    </MudStack>
 </MudStack>
 
 @code {
     [Parameter, EditorRequired] public WarPlayer Player { get; set; }
-
+    [Parameter] public EventCallback OnDeckClicked { get; set; }
 }

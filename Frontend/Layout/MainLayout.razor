@@ -2,7 +2,7 @@
 @inject NavigationManager navigationManager
 
 @* Required *@
-<MudThemeProvider />
+<MudThemeProvider Theme="@_theme" IsDarkMode="true" />
 <MudPopoverProvider />
 
 @* Needed for dialogs *@
@@ -38,6 +38,11 @@
 
 @code {
     bool _drawerOpen = true;
+
+    MudTheme _theme = new()
+    {
+
+    };
 
     void DrawerToggle()
     {

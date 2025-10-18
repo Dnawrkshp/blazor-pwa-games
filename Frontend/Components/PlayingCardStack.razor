@@ -5,7 +5,7 @@
         @foreach (var idx in Enumerable.Range(0, Cards.Count()))
         {
             var card = Cards.ElementAt(Cards.Count() - 1 - idx);
-            <PlayingCardComponent Card="@card" Size="Size.Medium" Style="@GetCardStyle(idx, card)" />
+            <PlayingCardComponent Card="@card" Size="Size.Medium" Style="@GetCardStyle(idx, card)" OnClick="() => OnCardClicked.InvokeAsync(card)" />
         }
     </CascadingValue>
 </div>
@@ -15,12 +15,14 @@
     [Parameter] public int? Width { get; set; }
     [Parameter] public int? Height { get; set; }
     [Parameter] public bool Neat { get; set; } = true;
+    [Parameter] public EventCallback<PlayingCard> OnCardClicked { get; set; }
 
     private string GetStyle()
     {
         var sb = new StringBuilder();
         if (Width.HasValue)
         {
+            sb.Append($"margin-left: {Width.Value*0.5}px;");
             sb.Append($"width: {Width.Value}px;");
         }
         if (Height.HasValue)
