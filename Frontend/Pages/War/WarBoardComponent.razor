@@ -1,0 +1,12 @@
+@using System.Text
+
+<MudStack Row Justify="Justify.Center" AlignItems="AlignItems.Center" Class="mud-width-full">
+    <PlayingCardStack Cards="@TopPlayer.Stack" Width="100" Height="100" Neat="false" />
+    <PlayingCardStack Cards="@BottomPlayer.Stack" Width="100" Height="100" Neat="false" />
+</MudStack>
+
+@code {
+    [Parameter, EditorRequired] public WarPlayer TopPlayer { get; set; }
+    [Parameter, EditorRequired] public WarPlayer BottomPlayer { get; set; }
+
+}

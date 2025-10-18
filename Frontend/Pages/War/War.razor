@@ -1,0 +1,90 @@
+﻿@page "/war"
+
+<PageTitle>War</PageTitle>
+
+<br/>
+<MudStack Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Spacing="2" Class="mud-width-full mud-height-full">
+    <WarPlayerComponent Player="@_game.Opponent" />
+    <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center" Class="mud-width-full">
+        @if (_game.PlayerWon)
+        {
+            <MudStack Spacing="2" AlignItems="AlignItems.Center">
+                <MudText Typo="Typo.h3">You Win</MudText>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ResetGame">Play Again?</MudButton>
+                <br/>
+            </MudStack>
+        }
+        else if (_game.PlayerLost)
+        {
+            <MudStack Spacing="2" AlignItems="AlignItems.Center">
+                <MudText Typo="Typo.h3">You Lost</MudText>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ResetGame">Play Again?</MudButton>
+                <br/>
+            </MudStack>
+        }
+        else if (_lastOutcome == WarBattleOutcome.War)
+        {
+            <MudStack Spacing="0" AlignItems="AlignItems.Center">
+                <MudText Typo="Typo.h5">WAR</MudText>
+                <MudText Typo="Typo.caption">Play 4</MudText>
+            </MudStack>
+        }
+        else if (_lastOutcome == WarBattleOutcome.PlayerWon)
+        {
+            <MudText Typo="Typo.h5">Win</MudText>
+        }
+        else if (_lastOutcome == WarBattleOutcome.OpponentWon)
+        {
+            <MudText Typo="Typo.h5">Loss</MudText>
+        }
+        <WarBoardComponent TopPlayer="@_game.Opponent" BottomPlayer="@_game.Player" />
+    </MudStack>
+    <WarPlayerComponent Player="@_game.Player" OnDeckClicked="@OnPlayerDeckClickedAsync" />
+</MudStack>
+
+@code {
+    private WarGame _game = new WarGame();
+    private WarBattleOutcome _lastOutcome = WarBattleOutcome.InProgress;
+    private int _inAction = 0;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        ResetGame();
+    }
+
+    private void ResetGame()
+    {
+        _game.Reset();
+        StateHasChanged();
+    }
+
+    private async Task OnPlayerDeckClickedAsync()
+    {
+        if (_inAction > 0)
+        {
+            _lastOutcome = _game.CheckBattle();
+            _game.CheckShuffle();
+            await InvokeAsync(StateHasChanged);
+        }
+
+        var actionId = ++_inAction;
+
+        // begin
+        _game.DrawCards();
+        _lastOutcome = _game.GetOutcome();
+        await InvokeAsync(StateHasChanged);
+        await Task.Delay(1000);
+        if (_inAction != actionId) return;
+
+        // show outcome
+        _lastOutcome = _game.CheckBattle();
+        await InvokeAsync(StateHasChanged);
+        //await Task.Delay(100);
+
+        // reset
+        _inAction = 0;
+        _game.CheckShuffle();
+        await InvokeAsync(StateHasChanged);
+    }
+}

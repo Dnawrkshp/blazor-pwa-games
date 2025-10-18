@@ -1,0 +1,53 @@
+@using System.Text
+
+<div class="playing-card-stack" style="@GetStyle()">
+    <CascadingValue Value="this">
+        @foreach (var idx in Enumerable.Range(0, Cards.Count()))
+        {
+            var card = Cards.ElementAt(Cards.Count() - 1 - idx);
+            <PlayingCardComponent Card="@card" Size="Size.Medium" Style="@GetCardStyle(idx, card)" OnClick="() => OnCardClicked.InvokeAsync(card)" />
+        }
+    </CascadingValue>
+</div>
+
+@code {
+    [Parameter] public IEnumerable<PlayingCard> Cards { get; set; } = [];
+    [Parameter] public int? Width { get; set; }
+    [Parameter] public int? Height { get; set; }
+    [Parameter] public bool Neat { get; set; } = true;
+    [Parameter] public EventCallback<PlayingCard> OnCardClicked { get; set; }
+
+    private string GetStyle()
+    {
+        var sb = new StringBuilder();
+        if (Width.HasValue)
+        {
+            sb.Append($"margin-left: {Width.Value*0.5}px;");
+            sb.Append($"width: {Width.Value}px;");
+        }
+        if (Height.HasValue)
+        {
+            sb.Append($"height: {Height.Value}px;");
+        }
+        return sb.ToString();
+    }
+
+    private string GetCardStyle(int index, PlayingCard card)
+    {
+        var sb = new StringBuilder();
+
+        if (Neat)
+        {
+            var offset = Math.Min(5, index);
+            sb.Append($"transform: translate({offset}px, 0px);");
+        }
+        else
+        {
+            var rotate = (card.GetHashCode() % 10);
+            var offset = (card.GetHashCode() % 5);
+            sb.Append($"transform: translate({offset}px, {offset}px) rotate({rotate}deg);");
+        }
+
+        return sb.ToString();
+    }
+}
