@@ -1,4 +1,5 @@
 ﻿@inherits LayoutComponentBase
+@inject NavigationManager navigationManager
 
 @* Required *@
 <MudThemeProvider />
@@ -12,16 +13,21 @@
 
 <MudLayout>
     <MudAppBar>
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
-        PWA Games
+        <MudStack Row Justify="Justify.SpaceBetween" Class="mud-width-full">
+            <MudStack Row AlignItems="AlignItems.Center">
+                <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+                PWA Games
+            </MudStack>
+            <MudIconButton Icon="@Icons.Material.Filled.Refresh" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => Refresh())" />
+        </MudStack>
     </MudAppBar>
     <MudDrawer @bind-Open="@_drawerOpen">
         <NavMenu/>
     </MudDrawer>
     <MudMainContent>
-      <MudContainer MaxWidth="MaxWidth.Medium">
-          @Body
-      </MudContainer>
+        <MudContainer MaxWidth="MaxWidth.Medium">
+            @Body
+        </MudContainer>
     </MudMainContent>
 </MudLayout>
 
@@ -31,5 +37,10 @@
     void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
+    }
+
+    void Refresh()
+    {
+        navigationManager.Refresh();
     }
 }
