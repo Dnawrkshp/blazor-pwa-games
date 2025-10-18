@@ -1,0 +1,11 @@
+@using System.Text
+
+<MudStack Row>
+    <PlayingCardStack Cards="@Player.Discard" Neat="false" Width="200" Height="150" />
+    <PlayingCardStack Cards="@Player.Deck.Cards" Neat="true" Width="200" Height="150" />
+</MudStack>
+
+@code {
+    [Parameter, EditorRequired] public WarPlayer Player { get; set; }
+
+}

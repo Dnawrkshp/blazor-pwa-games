@@ -17,7 +17,9 @@
             <MudStack Row AlignItems="AlignItems.Center">
                 <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
                 PWA Games
-                <MudText Typo="Typo.caption">%VERSION%</MudText>
+
+                @* Replaced with git commit by github deployment action *@
+                <MudText Typo="Typo.caption">@*%VERSION%*@</MudText>
             </MudStack>
             <MudIconButton Icon="@Icons.Material.Filled.Refresh" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => Refresh())" />
         </MudStack>
@@ -26,8 +28,10 @@
         <NavMenu/>
     </MudDrawer>
     <MudMainContent>
-        <MudContainer MaxWidth="MaxWidth.Medium">
-            @Body
+        <MudContainer MaxWidth="MaxWidth.Medium" Style="height: calc(100vh - 64px)">
+            <MudStack Class="mud-height-full">
+                @Body
+            </MudStack>
         </MudContainer>
     </MudMainContent>
 </MudLayout>

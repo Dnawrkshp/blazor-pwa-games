@@ -1,0 +1,30 @@
+@using System.Text
+
+<div class="playing-card">
+    @if (Card.IsFaceUp)
+    {
+        <MudImage Src="@Card.GetImagePath()" Alt="@Card.ToString()" Height="@GetHeight()" Style="@Style" />
+    }
+    else
+    {
+        <MudImage Src="images/cards/back.png" Alt="Card Back" Height="@GetHeight()" Style="@Style" />
+    }
+</div>
+
+@code {
+    [CascadingParameter] private PlayingCardStack? Stack { get; set; }
+    [Parameter, EditorRequired] public PlayingCard Card { get; set; }
+    [Parameter] public Size Size { get; set; } = Size.Medium;
+    [Parameter] public string? Style { get; set; }
+
+    private int GetHeight()
+    {
+        return Size switch
+        {
+            Size.Small => 75,
+            Size.Medium => 100,
+            Size.Large => 150,
+            _ => 100
+        };
+    }
+}

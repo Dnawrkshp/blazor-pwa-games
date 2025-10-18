@@ -1,0 +1,48 @@
+﻿@page "/war"
+
+<PageTitle>War</PageTitle>
+
+<br/>
+<MudStack Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Spacing="2" Class="mud-width-full mud-height-full">
+    <WarPlayerComponent Player="@opp" />
+    <WarBoardComponent TopPlayer="@opp" BottomPlayer="@player" />
+    <WarPlayerComponent Player="@player" />
+</MudStack>
+
+<MudButton Variant="Variant.Filled" OnClick="ResetGame">Restart Game</MudButton>
+
+@code {
+    private WarPlayer player = new WarPlayer();
+    private WarPlayer opp = new WarPlayer();
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        ResetGame();
+        StateHasChanged();
+    }
+
+    private void ResetGame()
+    {
+        PlayingCardDeck? deck = PlayingCardDeck.CreateStandardDeck();
+        deck.Shuffle();
+
+        player.Reset();
+        opp.Reset();
+
+        for (int i = 0; deck.Count > 0; i++)
+        {
+            var card = deck.Pop();
+            if (card == null) break;
+
+            if (i % 2 == 0)
+            {
+                player.Deck.Push(card.Value);
+            }
+            else
+            {
+                opp.Deck.Push(card.Value);
+            }
+        }
+    }
+}
