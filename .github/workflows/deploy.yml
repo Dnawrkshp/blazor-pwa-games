@@ -1,21 +1,37 @@
 name: Deploy PWA to GitHub Pages
+
 on:
   push:
     branches: [ main ]
+
 permissions:
   contents: write
+
 jobs:
-  build-deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - name: Setup .NET
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 9 SDK
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '9.0.x'
-      - name: Publish
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build and publish
         run: dotnet publish -c Release -o release
-      - name: Deploy
+
+      - name: Update base href for GitHub Pages
+        run: |
+          REPO_NAME=$(basename $GITHUB_REPOSITORY)
+          sed -i "s|<base href=\"/\" />|<base href=\"/$REPO_NAME/\" />|" release/wwwroot/index.html
+
+      - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
