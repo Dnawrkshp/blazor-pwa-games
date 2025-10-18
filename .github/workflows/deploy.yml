@@ -23,6 +23,11 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore
 
+      - name: Replace %VERSION% in MainLayout.razor
+        run: |
+          COMMIT_HASH=$(git rev-parse --short HEAD)
+          sed -i "s|%VERSION%|$COMMIT_HASH|g" Frontend/Layout/MainLayout.razor
+
       - name: Build and publish
         run: dotnet publish -c Release -o release
 
