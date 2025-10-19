@@ -161,6 +161,8 @@ namespace Frontend.Pages.War
         {
             foreach (var pair in Player.Stack.Zip(Opponent.Stack))
             {
+                pair.First.IsFaceUp = true;
+                pair.Second.IsFaceUp = true;
                 Player.Discard.Push(pair.Second);
                 Player.Discard.Push(pair.First);
             }
@@ -174,6 +176,8 @@ namespace Frontend.Pages.War
         {
             foreach (var pair in Opponent.Stack.Zip(Player.Stack))
             {
+                pair.First.IsFaceUp = true;
+                pair.Second.IsFaceUp = true;
                 Opponent.Discard.Push(pair.First);
                 Opponent.Discard.Push(pair.Second);
             }

@@ -1,17 +1,20 @@
 @using System.Text
 
-<div class="playing-card-stack" style="@GetStyle()">
+<div id="@ElementId" class="@($"{Class} playing-card-stack")" style="@GetStyle()">
     <CascadingValue Value="this">
         @foreach (var idx in Enumerable.Range(0, Cards.Count()))
         {
             var card = Cards.ElementAt(Cards.Count() - 1 - idx);
-            <PlayingCardComponent Card="@card" Size="Size.Medium" Style="@GetCardStyle(idx, card)" OnClick="() => OnCardClicked.InvokeAsync(card)" />
+            <PlayingCardComponent Card="@card" Size="Size.Medium" Class="@CardClass" Style="@GetCardStyle(idx, card)" OnClick="() => OnCardClicked.InvokeAsync(card)" />
         }
     </CascadingValue>
 </div>
 
 @code {
     [Parameter] public IEnumerable<PlayingCard> Cards { get; set; } = [];
+    [Parameter] public string? ElementId { get; set; }
+    [Parameter] public string? Class { get; set; }
+    [Parameter] public string? CardClass { get; set; }
     [Parameter] public int? Width { get; set; }
     [Parameter] public int? Height { get; set; }
     [Parameter] public bool Neat { get; set; } = true;

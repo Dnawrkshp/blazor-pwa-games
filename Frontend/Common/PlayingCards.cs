@@ -28,6 +28,8 @@ namespace Frontend.Common
 
     public class PlayingCard
     {
+        public static int _idCounter = 0;
+        public int Uid { get; private set; }
         public Suit Suit { get; set; }
         public Rank Rank { get; set; }
         public bool IsFaceUp { get; set; } = true;
@@ -37,6 +39,7 @@ namespace Frontend.Common
 
         public PlayingCard(Suit suit, Rank rank, bool isFaceUp = true)
         {
+            Uid = ++_idCounter;
             Suit = suit;
             Rank = rank;
             IsFaceUp = isFaceUp;
@@ -81,6 +84,11 @@ namespace Frontend.Common
         {
             if (obj is not PlayingCard other) return false;
             return Suit == other.Suit && Rank == other.Rank;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Suit, Rank);
         }
 
         public static bool operator ==(PlayingCard? left, PlayingCard? right) => Equals(left, right);

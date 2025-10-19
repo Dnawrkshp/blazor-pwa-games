@@ -1,46 +1,97 @@
 ﻿@page "/war"
+@inject IJSRuntime js
 
 <PageTitle>War</PageTitle>
 
 <br/>
-<MudStack Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Spacing="2" Class="mud-width-full mud-height-full">
-    <WarPlayerComponent Player="@_game.Opponent" />
+<MudStack Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Spacing="2" Class="war-game mud-width-full mud-height-full no-select">
+    <WarPlayerComponent PlayerId="1" Player="@_game.Opponent" />
     <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center" Class="mud-width-full">
-        @if (_game.PlayerWon)
-        {
-            <MudStack Spacing="2" AlignItems="AlignItems.Center">
-                <MudText Typo="Typo.h3">You Win</MudText>
-                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ResetGame">Play Again?</MudButton>
-                <br/>
-            </MudStack>
-        }
-        else if (_game.PlayerLost)
-        {
-            <MudStack Spacing="2" AlignItems="AlignItems.Center">
-                <MudText Typo="Typo.h3">You Lost</MudText>
-                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ResetGame">Play Again?</MudButton>
-                <br/>
-            </MudStack>
-        }
-        else if (_lastOutcome == WarBattleOutcome.War)
-        {
-            <MudStack Spacing="0" AlignItems="AlignItems.Center">
-                <MudText Typo="Typo.h5">WAR</MudText>
-                <MudText Typo="Typo.caption">Play 4</MudText>
-            </MudStack>
-        }
-        else if (_lastOutcome == WarBattleOutcome.PlayerWon)
-        {
-            <MudText Typo="Typo.h5">Win</MudText>
-        }
-        else if (_lastOutcome == WarBattleOutcome.OpponentWon)
-        {
-            <MudText Typo="Typo.h5">Loss</MudText>
-        }
+        <MudStack Style="position: absolute; height: 60px;">
+            @if (_game.PlayerWon)
+            {
+                <MudStack Spacing="2" AlignItems="AlignItems.Center">
+                    <MudText Typo="Typo.h3">You Win</MudText>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ResetGame">Play Again?</MudButton>
+                    <br/>
+                </MudStack>
+            }
+            else if (_game.PlayerLost)
+            {
+                <MudStack Spacing="2" AlignItems="AlignItems.Center">
+                    <MudText Typo="Typo.h3">You Lost</MudText>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ResetGame">Play Again?</MudButton>
+                    <br/>
+                </MudStack>
+            }
+            else if (_lastOutcome == WarBattleOutcome.War)
+            {
+                <MudStack Spacing="0" AlignItems="AlignItems.Center">
+                    <MudText Typo="Typo.h5">WAR</MudText>
+                    <MudText Typo="Typo.caption">Play 4</MudText>
+                </MudStack>
+            }
+        </MudStack>
         <WarBoardComponent TopPlayer="@_game.Opponent" BottomPlayer="@_game.Player" />
     </MudStack>
-    <WarPlayerComponent Player="@_game.Player" OnDeckClicked="@OnPlayerDeckClickedAsync" />
+    <WarPlayerComponent PlayerId="2" Player="@_game.Player" OnDeckClicked="@OnPlayerDeckClickedAsync" />
 </MudStack>
+
+<script>
+function moveToElement(elementToMove, elementToTarget) {
+    if (!elementToMove || !elementToTarget) return;
+
+    // Get bounding boxes for both elements
+    const dstRect = elementToTarget.getBoundingClientRect();
+    const srcRect = elementToMove.getBoundingClientRect();
+
+    // Compute the delta (difference) between their positions
+    const deltaX = dstRect.left - srcRect.left;
+    const deltaY = dstRect.top - srcRect.top;
+
+    // Apply a smooth transition and transform
+    elementToMove.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+}
+
+function playCards(player) {
+    const elements = document.querySelectorAll(`#player-stack-${player} .playing-card`);
+    const stack = document.querySelector(`#war-player-${player}-deck`);
+    elements.forEach(el => {
+        if (!el.classList.contains('play')) {
+            moveToElement(el, stack);
+            setTimeout(() => {
+                el.style.transition = 'transform 0.5s ease';
+                el.classList.add('play');
+            }, 10);
+        }
+    });
+}
+
+function discardCards(player) {
+    console.log('test');
+    const elements = document.querySelectorAll(`#war-player-${player}-discard .playing-card`);
+    const stack = document.querySelector(`#player-stack-middle`);
+    elements.forEach(el => {
+        if (!el.classList.contains('discard')) {
+            moveToElement(el, stack);
+            setTimeout(() => {
+                el.style.transition = 'transform 0.5s ease';
+                el.classList.add('discard');
+            }, 10);
+        }
+    });
+}
+
+window.playAllBoardCards = () => {
+    playCards(1);
+    playCards(2);
+};
+
+window.discardAllBoardCards = () => {
+    discardCards(1);
+    discardCards(2);
+};
+</script>
 
 @code {
     private WarGame _game = new WarGame();
@@ -51,6 +102,14 @@
     {
         base.OnInitialized();
         ResetGame();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        _ = js.InvokeVoidAsync("window.playAllBoardCards");
+        _ = js.InvokeVoidAsync("window.discardAllBoardCards");
     }
 
     private void ResetGame()
@@ -72,9 +131,9 @@
 
         // begin
         _game.DrawCards();
-        _lastOutcome = _game.GetOutcome();
+        var outcome = _lastOutcome = _game.GetOutcome();
         await InvokeAsync(StateHasChanged);
-        await Task.Delay(1000);
+        await Task.Delay(3000);
         if (_inAction != actionId) return;
 
         // show outcome
