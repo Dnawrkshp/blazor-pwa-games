@@ -17,12 +17,11 @@ https://dnawrkshp.github.io/blazor-pwa-games/
 Games
 -------------------
 
-- Counter — simple click counter demo — `/counter`
+- War — simple card game of war — `/war`
 
 Planned / Ideas
 ---------------
 
-- War (card game)
 - Klondike
 - Tic-tac-toe
 
