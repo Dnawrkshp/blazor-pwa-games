@@ -1,4 +1,16 @@
 
+.no-select {
+    user-select: none;              /* Prevent text/image selection */
+    -webkit-user-select: none;      /* Safari */
+    -moz-user-select: none;         /* Firefox */
+    -ms-user-select: none;          /* IE/Edge legacy */
+
+    -webkit-touch-callout: none;    /* Disable long-press context menu on iOS */
+    touch-action: manipulation;     /* Disable double-tap zoom */
+
+    pointer-events: auto;           /* Allow clicks/taps (optional) */
+}
+
 /* CSS for playing card component */
 .playing-card > img {
     border: 1px solid rgba(0,0,0,1);
@@ -13,8 +25,16 @@
     position: absolute;
     top: 0;
     left: 0;
-    transition: transform 0.3s ease;
     transform-origin: center;
+}
+
+/* WAR Game */
+.war-game .playing-card.play {
+  transform: translate(0px, 0px) !important;
+}
+
+.war-game .playing-card.discard {
+  transform: translate(0px, 0px) !important;
 }
 
 /* CSS for Blazor error UI and loading progress indicator */
